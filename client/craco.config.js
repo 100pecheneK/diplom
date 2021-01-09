@@ -15,6 +15,7 @@ module.exports = {
       '@services': path.resolve('./src/services/'),
       '@containers': path.resolve('./src/containers/'),
       '@utils': path.resolve('./src/utils/'),
+      '@config': path.resolve('./src/config/'),
     },
   },
 }

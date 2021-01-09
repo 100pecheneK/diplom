@@ -1,6 +1,6 @@
+import useAuth from '@hooks/useAuth'
 import React from 'react'
-import { Route, Redirect } from 'react-router-dom'
-import useAuth from 'src/hooks/useAuth'
+import { Redirect, Route } from 'react-router-dom'
 
 function PrivateRoute({ children, ...rest }) {
   let auth = useAuth()

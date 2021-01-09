@@ -1,47 +1,49 @@
-import config from '@/config'
+import config from '@/config/config'
 import {
   getAccessToken,
   getRefreshToken,
-  setAccessToken,
   resetTokensInLocalStorage,
+  setAccessToken
 } from '@utils/tokens'
 
-async function a(fn, args) {
-  const res = await fn(args)
-  if (res.ok) {
-    return res
-  } else {
-    const refreshed = await fakeAuth.refreshAccessToken()
-    if (refreshed.ok) {
-      const rr = await refreshed.json()
-      setAccessToken(rr.accessToken)
-
-      const newRes = await fn(args)
-      if (newRes.ok) {
-        return newRes
-      } else {
-        console.log(newRes)
-        return newRes
-      }
+function withDoubleAuthCheck<A, F extends { ok?: any }>(
+  fn: (...args: A[]) => Promise<F>
+) {
+  return async (...args: A[]): Promise<F> => {
+    const res = await fn(...args)
+    if (res.ok) {
+      return res
     } else {
-      resetTokensInLocalStorage()
-      throw new Error('Bad refresh token')
+      const refreshed = await fakeAuth.refreshAccessToken()
+      if (refreshed.ok) {
+        const rr = await refreshed.json()
+        setAccessToken(rr.accessToken)
+
+        const newRes = await fn(...args)
+        if (newRes.ok) {
+          return newRes
+        } else {
+          console.log(newRes)
+          return newRes
+        }
+      } else {
+        resetTokensInLocalStorage()
+        throw new Error('Bad refresh token')
+      }
     }
   }
 }
 
 const fakeAuth = {
-  async getUser() {
-    return await a(async () => {
-      const accessToken = getAccessToken()
-      const res = await fetch(config.API_URL + '/auth/me', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-      return res
+  getUser: withDoubleAuthCheck(async () => {
+    const accessToken = getAccessToken()
+    const res = await fetch(config.API_URL + '/auth/me', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     })
-  },
+    return res
+  }),
   async refreshAccessToken() {
     const refreshToken = getRefreshToken()
     const r = await fetch('http://localhost:4000/api/auth/token', {
@@ -51,7 +53,7 @@ const fakeAuth = {
     })
     return r
   },
-  async signin(data) {
+  async signin(data: any) {
     const res = await fetch(config.API_URL + '/auth/login', {
       method: 'POST',
       headers: {
@@ -66,7 +68,7 @@ const fakeAuth = {
       return { error: r.message }
     }
   },
-  async register(data) {
+  async register(data: any) {
     const res = await fetch(config.API_URL + '/auth/register', {
       method: 'POST',
       headers: {
@@ -81,7 +83,7 @@ const fakeAuth = {
       return { error: r.message }
     }
   },
-  async signout(data) {
+  async signout(data: any) {
     await fetch(config.API_URL + 'auth/logout', {
       method: 'DELETE',
       headers: {
@@ -90,8 +92,11 @@ const fakeAuth = {
       body: JSON.stringify(data),
     })
   },
-  async changePassword(data) {
-    return await a(async data => {
+  changePassword: withDoubleAuthCheck(
+    async (data: {
+      newPassword: string
+      oldPassword: string
+    }): Promise<{ ok?: any; error?: string }> => {
       const accessToken = getAccessToken()
       const r = await fetch(config.API_URL + '/auth/password', {
         method: 'POST',
@@ -107,7 +112,7 @@ const fakeAuth = {
       } else {
         return { error: res.message }
       }
-    }, data)
-  },
+    }
+  ),
 }
 export default fakeAuth

@@ -1,7 +1,15 @@
-import React from 'react'
-import Input from '@components/Input'
 import Alert from '@components/Alert'
+import Input, { IInputProps } from '@components/Input'
+import React from 'react'
 import { useForm } from 'react-hook-form'
+
+type TFormProps = {
+  serverError?: string
+  onSubmit: (form: object) => void
+  inputs: IInputProps[]
+  children?: React.ReactNode
+  submitButtonText: string
+}
 
 export default function Form({
   serverError,
@@ -9,7 +17,7 @@ export default function Form({
   inputs,
   children,
   submitButtonText,
-}) {
+}: TFormProps) {
   const { register, handleSubmit, errors } = useForm()
 
   return (

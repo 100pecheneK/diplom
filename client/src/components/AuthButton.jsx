@@ -1,8 +1,8 @@
+import useAuth from '@hooks/useAuth'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React from 'react'
 import { Link, useHistory } from 'react-router-dom'
-import useAuth from 'src/hooks/useAuth'
 
 function AuthButton({ className }) {
   let history = useHistory()

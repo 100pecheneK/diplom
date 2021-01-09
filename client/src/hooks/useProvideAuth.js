@@ -1,12 +1,11 @@
-import { useState, useEffect } from 'react'
-
 import fakeAuth from '@services/fakeAuth'
 import {
-  resetTokensInLocalStorage,
   getRefreshToken,
-  setRefreshToken,
+  resetTokensInLocalStorage,
   setAccessToken,
+  setRefreshToken
 } from '@utils/tokens'
+import { useEffect, useState } from 'react'
 
 export default function useProvideAuth() {
   const [login, setLogin] = useState(false)
@@ -19,8 +18,9 @@ export default function useProvideAuth() {
         setLoading(true)
         const res = await fakeAuth.getUser()
         setUser(await res.json())
-        setLoading(false)
       } catch (error) {
+        console.error(error.message)
+      } finally {
         setLoading(false)
       }
     }

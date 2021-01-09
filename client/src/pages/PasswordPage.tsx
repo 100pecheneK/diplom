@@ -1,13 +1,12 @@
+import Form from '@components/Form'
+import useAuth from '@hooks/useAuth'
 import React, { useCallback, useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import useAuth from '@hooks/useAuth'
-import Form from '@components/Form'
 
 export default function PasswordPage() {
   const history = useHistory()
   const auth = useAuth()
-  // TODO: Придумать как это запихать в компонент формы
-  const [error, setError] = useState('')
+  const [serverError, setServerError] = useState('')
 
   const onSubmit = useCallback(
     async form => {
@@ -15,10 +14,10 @@ export default function PasswordPage() {
       if (res.ok) {
         history.replace('/protected')
       } else {
-        setError(res.error)
+        setServerError(res.error)
       }
     },
-    [auth, history]
+    [auth, history, setServerError]
   )
 
   return (
@@ -28,13 +27,11 @@ export default function PasswordPage() {
         {
           type: 'text',
           name: 'username',
-          value: '',
           autoComplete: 'username',
           hidden: true,
         },
         {
           type: 'password',
-          value: '',
           name: 'oldPassword',
           placeholder: 'Input current password',
           autoComplete: 'current-password',
@@ -42,7 +39,6 @@ export default function PasswordPage() {
         },
         {
           type: 'password',
-          value: '',
           name: 'newPassword',
           placeholder: 'Input new password',
           autoComplete: 'new-password',
@@ -50,8 +46,7 @@ export default function PasswordPage() {
         },
       ]}
       submitButtonText={'Confirm'}
-    >
-      <p>{error}</p>
-    </Form>
+      serverError={serverError}
+    />
   )
 }

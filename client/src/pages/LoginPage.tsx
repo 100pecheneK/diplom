@@ -1,11 +1,17 @@
+import Form from '@components/Form'
+import useAuth from '@hooks/useAuth'
 import React, { useCallback, useState } from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
-import useAuth from '@hooks/useAuth'
-import Form from '@components/Form'
+
+type TLocationState = {
+  from: {
+    pathname: string
+  }
+}
 
 function LoginPage() {
   const history = useHistory()
-  const location = useLocation()
+  const location = useLocation<TLocationState>()
   const { from } = location.state || { from: { pathname: '/' } }
   const auth = useAuth()
   const [serverError, setServerError] = useState('')
