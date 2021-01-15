@@ -3,7 +3,7 @@ import {
   getRefreshToken,
   resetTokensInLocalStorage,
   setAccessToken,
-  setRefreshToken
+  setRefreshToken,
 } from '@utils/tokens'
 import { useEffect, useState } from 'react'
 
@@ -51,6 +51,7 @@ export default function useProvideAuth() {
     await fakeAuth.signout({ token: refreshToken })
     setUser(null)
     setLoading(false)
+    setLogin(false)
   }
   const changePassword = async data => {
     const res = await fakeAuth.changePassword(data)
